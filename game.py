@@ -323,79 +323,6 @@ def findBestWeights():
     print(myAnswer)
     return myAnswer
 
-def rawDataGenerator(weights, numDataPoints):
-    dataList = []
-    for index in range(0, numDataPoints):
-        dataList.append(mainSimulator(weights,1))
-    weightString = str(weights)
-    fileName = "rawData" + weightString + ".txt"
-    with open(fileName, 'a') as file_handle:
-        for index in range(0, len(dataList)):
-            file_handle.write(str(dataList[index]))
-            file_handle.write("\n")
-
-def graphComparison(n, weights):
-    for index in range(100,n+100, 100):
-        centralLimitTheorem(index, weights)
-
-def centralLimitTheorem(numSamples, weights):
-    weightString = str(weights)
-    with open("rawData" + weightString + ".txt",'r') as file_handle:
-        savelines = file_handle.readlines()
-    
-    listOfSampleMeans = []
-    for index in range(0, len(savelines), numSamples):
-        linesToUse = savelines[index:index+numSamples]
-        sampleList = []
-        for line in linesToUse:
-            sampleList.append(int(line[0:-1]))
-        #print(sampleList)
-        listOfSampleMeans.append(np.average(sampleList))
-    
-    plt.hist(listOfSampleMeans)
-    plt.show()
-
-
-def averageScoreAsAFunctionOfWeights(weights, numRuns):
-    averageList = []
-    for index in range(0, numRuns):
-        averageList.append(mainSimulator(weights, 1))
-    ans = statistics.mean(averageList)
-    print(ans)
-    return ans
-
-def zoomOut(weights, numAverages, numRuns):
-    averageList = []
-    for index in range(0, numAverages):
-        averageList.append(averageScoreAsAFunctionOfWeights(weights, numRuns))
-    plt.hist(averageList)
-    plt.show()
-    return np.average(averageList)
-
-def zoomOutHistory(weights, numAverages, numRuns):
-    averageList = []
-    fileName = "previousRuns" + str(numRuns) + ".txt"
-    if not(os.path.exists(fileName)):
-        with open(fileName, 'w') as file_handle:
-            pass
-
-    with open(fileName, 'r') as file_handle:
-        savelines = file_handle.readlines()
-    
-    for line in savelines:
-        averageList.append(float(line[:-1]))
-
-    for index in range(0, numAverages):
-        averageList.append(averageScoreAsAFunctionOfWeights(weights, numRuns))
-    with open(fileName, 'w') as file_handle:
-        for index in range(0, len(averageList)):
-            writeString = str(averageList[index])
-            file_handle.write(writeString)
-            file_handle.write("\n")
-
-    plt.hist(averageList)
-    plt.show()
-    return np.average(averageList)
 
 def mainSimulator(weights, ply):
     currentBoard = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
@@ -453,10 +380,7 @@ def readMoves():
     
     tileContainer = driver.find_element_by_class_name("tile-container")
     tiles = tileContainer.get_attribute("outerHTML")
-    
 
-def test():
-    driver = webdriver.Chrome(ChromeDriverManager.install())
 
 def main(ply, weights):
     

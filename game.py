@@ -255,26 +255,13 @@ def snakeMetric(board):
                 [3**9, 3**10,3**11,3**12],
                 [3**16,3**15,3**14,3**13]]    
 
-    #weights =  [[3**0, 3**0, 3**0, 3**0],
-    #            [3**0, 3**0, 3**0, 3**0],
-    #            [3**1, 3**2, 3**3, 3**4],
-    #            [3**8, 3**7, 3**6, 3**5]]
-
-
     total = 0
 
     for rowIndex in range(0, len(board)):
         for colIndex in range(0, len(board[0])):
             total += (weights[rowIndex][colIndex] * board[rowIndex][colIndex])
     
-    #count = 0
-    #for rowIndex in range(0,len(board)):
-    #    for colIndex in range(0, len(board[rowIndex])):
-    #        if (board[rowIndex][colIndex] == 0):
-    #            count += 1
-    #return count 
     return total
-    # return deepMax(board)
 
 def niceBoard(board):
 

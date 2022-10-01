@@ -276,15 +276,6 @@ def snakeMetric(board):
     return total
     # return deepMax(board)
 
-def newYorkTimes():
-
-    driver = webdriver.Chrome(ChromeDriverManager().install())
-    
-    driver.get("https://www.nytimes.com/2018/05/09/business/ev-williams-twitter-medium.html")
-    #driver.get("https:play2048.co")
-    with open("article.txt", 'w') as file_handle:
-        file_handle.write(driver.page_source)
-
 def niceBoard(board):
 
     formattedString = ""

@@ -1,0 +1,17 @@
+Plan: 
+
+1. Use Python to interact with the website. 
+2. Write program logic/computations in C++ for speed purposes.
+3. Use ctypes python library to call the fast c++ functions from python
+
+-----------------------------------------------------------------------
+
+
+C++ functionality: 
+
+1. Build a Board object
+2. Simulate the possibilities if the board moves up, down, left, or right
+3. Return all possible boards
+4. Evaluate a board against some specified metric (metrics will likely also be board objects)
+5. Calculate the "possibility trees" at any given moment (i.e. return all the possibilities if we move left then right, right then down, etc...)
+

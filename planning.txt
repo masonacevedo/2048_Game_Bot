@@ -15,3 +15,8 @@ C++ functionality:
 4. Evaluate a board against some specified metric (metrics will likely also be board objects)
 5. Calculate the "possibility trees" at any given moment (i.e. return all the possibilities if we move left then right, right then down, etc...)
 
+----------------------------------------------------- 
+TODO: 
+1. Write test cases for "simulate" function
+2. Write logic for "simulate" function
+

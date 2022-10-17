@@ -331,47 +331,22 @@ def mainSimulator(weights, ply):
     while (not(gameOver(currentBoard))):
         
         
-        # NEXT THING TO DO:
-        # INCORPORATE THE ADDITION OF NEW TILES
         
         bestSequence = calculateBestSequenceSnake(currentBoard,ply, weights)
         counter = 1
         while (len(bestSequence) == 0):
-            #print("Hey! This isn't useless!")
             bestSequence = calculateBestSequenceSnake(currentBoard, ply-counter, weights)
             counter -= 1
-        #print(len(currentBoard))
-        #print(len(currentBoard[0]))
-        #print(len(currentBoard[1]))
-        #print(len(currentBoard[2]))
-        #print(len(currentBoard[3]))
-
-        #print(bestSequence)
-        #print(niceBoard(currentBoard))
-        #print("currentBoard:\n", niceBoard(currentBoard))
         if (bestSequence[0] == "Left"):
-            #print("LEFT")
-            #input("Press Enter to continue...")
             currentBoard = simulate(currentBoard, "Left")
         elif (bestSequence[0] == "Right"):
-            #print("RIGHT")
-            #input("Press Enter to continue...")
             currentBoard = simulate(currentBoard, "Right")
         elif (bestSequence[0] == "Up"):
-            #print("UP")
-            #input("Press Enter to continue...")
             currentBoard = simulate(currentBoard, "Up")
         else:
-            #print("DOWN")
-            #input("Press Enter to continue...")
             currentBoard = simulate(currentBoard, "Down")
-        #
         addRandomTile(currentBoard)
-    #print("GAME OVER!\nTHIS WAS THE BOARD AT THE END")
-    #print(niceBoard(currentBoard))
-    #print("Another simulation has finished.")
     ans = deepMax(currentBoard)
-    #print(ans)
     return ans
 
 def readMoves():
@@ -383,17 +358,12 @@ def readMoves():
 
 
 def main(ply, weights):
-    
-    # driver = webdriver.Chrome(ChromeDriverManager().install())
-    
-    # begin test
+
     options = webdriver.ChromeOptions()
     options.add_argument('--ignore-certificate-errors')
     options.add_argument('--ignore-ssl-errors')
     
-    # driver = webdriver.Chrome(chrome_options=options)
     
-    # driver = webdriver.Chrome("C:/Users/undoc/Desktop/Not_Sure_If_I_Can_Delete/chromedriver_win32/chromedriver.exe", chrome_options=options)
     driver = webdriver.Chrome(ChromeDriverManager().install())
     driver.get("https://play2048.co")
     
@@ -403,18 +373,10 @@ def main(ply, weights):
     controller = driver.find_element_by_css_selector('html')
 
     while (gameStatus.text != "Game over!"):
-        #time.sleep(0)
-        #print("Immediately before getTiles()")
         currentBoard = getTiles(driver)
         
-        # NEXT THING TO DO:
-        # INCORPORATE THE ADDITION OF NEW TILES
         bestSequence = calculateBestSequenceSnake(currentBoard,ply, weights)
         
-        #print("niceBoard(currentBoard)):\n")
-        #print(niceBoard(currentBoard))
-        #input("Press Enter to continue...")
-        #print("currentBoard:\n", niceBoard(currentBoard))
         if (bestSequence[0] == "Left"):
             print("Left:\n", niceBoard(simulate(currentBoard, "Left")))
             controller.send_keys(Keys.LEFT)
@@ -427,10 +389,7 @@ def main(ply, weights):
         else:
             print("Down:\n", niceBoard(simulate(currentBoard, "Down")))
             controller.send_keys(Keys.DOWN)
-        #input("Press Enter to continue...")
-        
-        # print(calculateScore(board))
-
+    
 
 def readScore(driver):
     scoreContainer = driver.find_element_by_xpath("/html/body/div[3]/div[1]/div/div[1]")
@@ -507,8 +466,6 @@ def calculateBestSequenceSnake(currentBoard, lookAhead, weights):
 
         results = [leftResult, rightResult, upResult, downResult]
         
-        #print("Results:", results)
-
         bestIndex = results.index(max(results))
         if (bestIndex == 0):
             return bestLeft

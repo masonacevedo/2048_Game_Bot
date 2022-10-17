@@ -3,7 +3,7 @@
 These are files for a program I wrote in the thick of the pandemic, in 2020.
 
 I got bored, so I wrote a program to play the game 2048. 
-If you've never seen this game before, check out [play2048.co](https::/play2048.co)
+If you've never seen this game before, check out [play2048.co]( https://play2048.co/ )
 
 The program I wrote in 2020 opens up a chrome browser using the library
 *selenium*, then it navigates to the website, and starts playing the game automatically. 

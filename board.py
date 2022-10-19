@@ -1,38 +1,52 @@
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-import time
 import copy
-import numpy as np
-from webdriver_manager.chrome import ChromeDriverManager
 import random
-import matplotlib.pyplot as plt
-import scipy.optimize
-import statistics
-import os
+import numpy as np
 
-myBoard = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
-halfWeights = [0.5,0.5,0.5,0.5,
-             0.5,0.5,0.5,0.5,
-             0.5,0.5,0.5,0.5,
-             0.5,0.5,0.5,0.5]
-snakeWeights =  [[3**1, 3**2, 3**3, 3**4],
-            [3**8, 3**7, 3**6, 3**5],
-            [3**9, 3**10,3**11,3**12],
-            [3**16,3**15,3**14,3**13]] 
-
-def findAllOccurences(string, character):
-    indexList = []
-    adjustmentList = [0]
-
-    copy = string
-    while (copy.find(character) != -1):
-        index = copy.find(character)
-        indexList.append(index + adjustmentList[-1])
-        adjustmentList.append(len(string) - len(copy[index+1::]))
-        copy = copy[index+1::]
+class Board:
     
-    return indexList
+    def __init__(self):
+        self.tiles = [
+            [0,0,0,0],
+            [0,0,0,0],
+            [0,0,0,0],
+            [0,0,0,0]
+            ]
 
+    def __str__(self):
+
+        formattedString = ""
+        longestNumLength = len(str(deepMax(self.tiles)))
+        for outerIndex in range(0, len(self.tiles)):
+            for innerIndex in range(0, len(self.tiles[outerIndex])):
+                lengthToUse = longestNumLength - len(str(self.tiles[outerIndex][innerIndex]))
+                lengthToUse += 2
+                formattedString += (str(self.tiles[outerIndex][innerIndex]) + (lengthToUse * " ")) 
+            formattedString += '\n'
+
+        return formattedString
+    
+
+    def validMove(currentBoard, move):
+        if (simulate(currentBoard, move) == "NO MOVE TO SIMULATE"):
+            return False
+        else:
+            return True
+
+    # Seems like we should probably get rid of this function...
+    def deepMax(L):
+        if ((len(L) == 1) and (type(L[0]) == int)):
+            return L[0]
+        elif ((len(L) != 1) and (type(L[0]) == int)):
+            return max(L[0],deepMax(L[1:]))
+        elif ((len(L) == 1)):
+            return deepMax(L[0])
+        else:
+            return max(deepMax(L[0]), deepMax(L[1:]))
+
+
+
+# This code is NOT DRY AT ALL. Gotta figure out 
+# a way to make it DRY. 
 def shiftDown(board):
     newBoard =  [[0,0,0,0],
                  [0,0,0,0],
@@ -117,6 +131,11 @@ def shiftRight(board):
     
     return newBoard
 
+
+
+
+# Similar Dryness Problem Here
+
 def simulate(board, move):
 
     if (move == "Down"):
@@ -184,6 +203,11 @@ def simulate(board, move):
         return newBoard
 
 
+
+
+# 
+
+
 def addTiles(board):
     # returns a list containing all the possibilities
     # of where a new square can be added and what that square might be
@@ -205,41 +229,6 @@ def addTiles(board):
     return possibilitiesList
 
 
-def getTiles(driver):
-    tileContainer = driver.find_element_by_class_name("tile-container")
-    tiles = tileContainer.get_attribute("outerHTML")
-    beginBracketIndices = findAllOccurences(tiles, "<")
-    endBracketIndices = findAllOccurences(tiles, ">")
-    
-
-    tileTable = [[0,0,0,0],
-                 [0,0,0,0],
-                 [0,0,0,0],
-                 [0,0,0,0]]
-    
-    for index in range(0, len(beginBracketIndices)-1):
-        if (index % 4 == 1):
-            tileString = tiles[beginBracketIndices[index]:endBracketIndices[index]+1]
-            columnIndex = int(tileString[tileString.find("p")+len("position-")])-1
-            rowIndex = int(tileString[tileString.find("p") + len("position-1-")])-1
-
-            beforeValueIndex = tileString.find("tile tile-")+len("tile tile-")
-            afterValueIndex = tileString.find(" tile-position")
-            tileValue = tileString[beforeValueIndex:afterValueIndex+1]
-            
-            tileTable[rowIndex][columnIndex] = int(tileValue)
-    
-    return tileTable
-
-def deepMax(L):
-    if ((len(L) == 1) and (type(L[0]) == int)):
-        return L[0]
-    elif ((len(L) != 1) and (type(L[0]) == int)):
-        return max(L[0],deepMax(L[1:]))
-    elif ((len(L) == 1)):
-        return deepMax(L[0])
-    else:
-        return max(deepMax(L[0]), deepMax(L[1:]))
 
 
 def arbitraryWeightsMetric(board, weights):
@@ -249,31 +238,8 @@ def arbitraryWeightsMetric(board, weights):
             total += (weights[rowIndex][colIndex] * board[rowIndex][colIndex])
     return total
 
-def snakeMetric(board):
-    weights =  [[3**1, 3**2, 3**3, 3**4],
-                [3**8, 3**7, 3**6, 3**5],
-                [3**9, 3**10,3**11,3**12],
-                [3**16,3**15,3**14,3**13]]    
 
-    total = 0
 
-    for rowIndex in range(0, len(board)):
-        for colIndex in range(0, len(board[0])):
-            total += (weights[rowIndex][colIndex] * board[rowIndex][colIndex])
-    
-    return total
-
-def niceBoard(board):
-
-    formattedString = ""
-    longestNumLength = len(str(deepMax(board)))
-    for outerIndex in range(0, len(board)):
-        for innerIndex in range(0, len(board[outerIndex])):
-            lengthToUse = longestNumLength - len(str(board[outerIndex][innerIndex]))
-            lengthToUse += 2
-            formattedString += (str(board[outerIndex][innerIndex]) + (lengthToUse * " ")) 
-        formattedString += '\n'
-    return formattedString
 
 def addRandomTile(board):
     zeroCoordinates = []
@@ -286,119 +252,9 @@ def addRandomTile(board):
     addedValue = random.choice([2,4])
     board[coordinatesToAddTo[0]][coordinatesToAddTo[1]] = addedValue
 
-def gameOver(board):
-    for outerIndex in range(0, len(board)):
-        for innerIndex in range(0, len(board)):
-            if (board[outerIndex][innerIndex] == 0):
-                return False
-    moveList = ["Left", "Right", "Up", "Down"]
-    for move in moveList:
-        if (simulate(board, move) != "NO MOVE TO SIMULATE"):
-            return False
-    
-    return True
-
-def functionToMinimize(inputVector):
-    weights = [[inputVector[0], inputVector[1], inputVector[2], inputVector[3]],
-               [inputVector[4], inputVector[5], inputVector[6], inputVector[7]],
-               [inputVector[8], inputVector[9], inputVector[10], inputVector[11]],
-               [inputVector[12], inputVector[13], inputVector[14], inputVector[15]]]
-    print("weights:",weights)
-    return (1/(mainSimulator(weights, 1)))
-
-def findBestWeights():
-    initialGuess = [0, 1, 2, 3,
-                    4,5,6,7,
-                    8,9,10,11,
-                    12,13,14,15]
-
-    myBounds = ((0,15),(0,15),(0,15),(0,15),
-                (0,15),(0,15),(0,15),(0,15),
-                (0,15),(0,15),(0,15),(0,15),
-                (0,15),(0,15),(0,15),(0,15))
-    myAnswer = scipy.optimize.minimize(functionToMinimize, 
-                                       x0 = initialGuess, 
-                                       bounds = myBounds,
-                                       options = {'maxiter':5, "disp":True})
-    print(myAnswer)
-    return myAnswer
 
 
-def mainSimulator(weights, ply):
-    currentBoard = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
-    addRandomTile(currentBoard)
-    addRandomTile(currentBoard)
-    while (not(gameOver(currentBoard))):
-        
-        
-        
-        bestSequence = calculateBestSequenceSnake(currentBoard,ply, weights)
-        counter = 1
-        while (len(bestSequence) == 0):
-            bestSequence = calculateBestSequenceSnake(currentBoard, ply-counter, weights)
-            counter -= 1
-        if (bestSequence[0] == "Left"):
-            currentBoard = simulate(currentBoard, "Left")
-        elif (bestSequence[0] == "Right"):
-            currentBoard = simulate(currentBoard, "Right")
-        elif (bestSequence[0] == "Up"):
-            currentBoard = simulate(currentBoard, "Up")
-        else:
-            currentBoard = simulate(currentBoard, "Down")
-        addRandomTile(currentBoard)
-    ans = deepMax(currentBoard)
-    return ans
 
-def readMoves():
-    driver = webdriver.Chrome(ChromeDriverManager().install())
-    driver.get("https://play2048.co")
-    
-    tileContainer = driver.find_element_by_class_name("tile-container")
-    tiles = tileContainer.get_attribute("outerHTML")
-
-
-def main(ply, weights):
-
-    options = webdriver.ChromeOptions()
-    options.add_argument('--ignore-certificate-errors')
-    options.add_argument('--ignore-ssl-errors')
-    
-    
-    driver = webdriver.Chrome(ChromeDriverManager().install())
-    driver.get("https://play2048.co")
-    
-
-    gameStatus = driver.find_element_by_css_selector(".game-container p")
-
-    controller = driver.find_element_by_css_selector('html')
-
-    while (gameStatus.text != "Game over!"):
-        currentBoard = getTiles(driver)
-        
-        bestSequence = calculateBestSequenceSnake(currentBoard,ply, weights)
-        
-        if (bestSequence[0] == "Left"):
-            print("Left:\n", niceBoard(simulate(currentBoard, "Left")))
-            controller.send_keys(Keys.LEFT)
-        elif (bestSequence[0] == "Right"):
-            print("Right:\n", niceBoard(simulate(currentBoard, "Right")))
-            controller.send_keys(Keys.RIGHT)
-        elif (bestSequence[0] == "Up"):
-            print("Up:\n", niceBoard(simulate(currentBoard, "Up")))
-            controller.send_keys(Keys.UP)
-        else:
-            print("Down:\n", niceBoard(simulate(currentBoard, "Down")))
-            controller.send_keys(Keys.DOWN)
-    
-
-def readScore(driver):
-    scoreContainer = driver.find_element_by_xpath("/html/body/div[3]/div[1]/div/div[1]")
-    if ("\n" in scoreContainer.text):
-        indexOfNewline = scoreContainer.text.index("\n")
-        return scoreContainer.text[0:indexOfNewline]
-    else:
-        return scoreContainer.text
-        
 
 def calculateBestSequenceSnake(currentBoard, lookAhead, weights):
     if (lookAhead == 1):

@@ -21,3 +21,5 @@ Zero good software engineering practices.
 * generally readable code? Absolutely not! 
 
 The long-term goal here is to re-write the program logic in C++ to make it run faster, while still using python for interacting with the website. 
+
+For now though, I'm just working on re-factoring this monster of a program. 

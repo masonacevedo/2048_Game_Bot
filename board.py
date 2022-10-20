@@ -154,6 +154,31 @@ def calculateBestMove(currentBoard, ply):
 
     return move
 
+def simulateSequence(board, sequence):
+    """
+    Given a sequence of moves to simulate,
+    and a board, this function returns
+    all the possible outcomes after
+    simulating every one of those moves. 
+    """
+    if len(sequence) == 1:
+        newBoard = board.shift(move)        
+        possibleBoards = addTiles(newBoard)
+        return possibleBoards
+    else:
+        firstMove = sequence[0]
+        restOfSequence = sequence[1:]
+        newBoard = shiftBoard(firstMove)
+        possibleBoards = addTiles(newBoard)
+        # now, for each of the possible boards, 
+        # we need to simulate the next move
+        # in the sequence... 
+        ans = []
+        for board in possibleBoards:
+            ans = ans + simulateSequence(board, restOfSequence)
+
+        return ans
+
 def getSequences(n):
     """
     Given a positive integer n,
@@ -176,88 +201,6 @@ def getSequences(n):
             for move in Move:
                 ans.append(sequence + [move])
         return ans
-
-
-def simulateSequence(self, moveList):
-    """
-    Inputs: 
-        A list of moves, and the current 
-        state of the board. 
-    Outputs: 
-        All the possible outcomes after
-        those moves have been played. 
-    """
-    if len(moveList) == 1:
-        move = moveList[0]
-        
-
-
-# Code is extremely NOT DRY! Need to fix! 
-def simulate(self, move):
-
-    if (move == "Down"):
-        # move tiles down
-        newBoard = shiftDown(board)
-        # merge if necessary
-        for columnIndex in range(0,4):
-            doubledRows = []
-            for rowIndex in range(1,4):
-                if (newBoard[rowIndex-1][columnIndex] == newBoard[rowIndex][columnIndex] and newBoard[rowIndex][columnIndex] != 0):
-                    doubledRows.append(rowIndex)
-            for index in range(0,len(doubledRows)):
-                newBoard[doubledRows[index]][columnIndex] = 2*newBoard[doubledRows[index]][columnIndex]
-                newBoard[doubledRows[index]-1][columnIndex] = 0
-        # after merging, move down again
-        newBoard = shiftDown(newBoard)
-    elif (move == "Up"):
-        # move tiles down
-        newBoard = shiftUp(board)
-        # merge if necessary
-        for columnIndex in range(0,4):
-            doubledRows = []
-            for rowIndex in range(0,3):
-                if (newBoard[rowIndex][columnIndex] == newBoard[rowIndex+1][columnIndex] and newBoard[rowIndex][columnIndex] != 0):
-                    doubledRows.append(rowIndex)
-            for index in range(0,len(doubledRows)):
-                newBoard[doubledRows[index]][columnIndex] = 2*newBoard[doubledRows[index]][columnIndex]
-                newBoard[doubledRows[index]+1][columnIndex] = 0
-        # after merging, move down again
-        newBoard = shiftUp(newBoard)
-
-    elif (move == "Left"):
-        # move tiles down
-        newBoard = shiftLeft(board)
-        # merge if necessary
-        for rowIndex in range(0,4):
-            doubledCols = []
-            for colIndex in range(0,3):
-                if (newBoard[rowIndex][colIndex] == newBoard[rowIndex][colIndex+1] and newBoard[rowIndex][colIndex] != 0):
-                    doubledCols.append(colIndex)
-            for index in range(0,len(doubledCols)):
-                newBoard[rowIndex][doubledCols[index]] = 2*newBoard[rowIndex][doubledCols[index]]
-                newBoard[rowIndex][doubledCols[index]+1] = 0
-        # after merging, move down again
-        newBoard = shiftLeft(newBoard)
-
-    else: # move == "Right"
-        # move tiles down
-        newBoard = shiftRight(board)
-        # merge if necessary
-        for rowIndex in range(0,4):
-            doubledCols = []
-            for colIndex in range(1,4):
-                if (newBoard[rowIndex][colIndex-1] == newBoard[rowIndex][colIndex] and newBoard[rowIndex][colIndex] != 0):
-                    doubledCols.append(colIndex)
-            for index in range(0,len(doubledCols)):
-                newBoard[rowIndex][doubledCols[index]] = 2*newBoard[rowIndex][doubledCols[index]]
-                newBoard[rowIndex][doubledCols[index]-1] = 0
-        # after merging, move down again
-        newBoard = shiftRight(newBoard)
-    
-    if (newBoard == board):
-        return "NO MOVE TO SIMULATE"
-    else:
-        return newBoard
 
 def addRandomTile(self):
     """ Adds a 2 or 4 to the board in a random, empty tile. """
@@ -282,76 +225,47 @@ def validMove(self, move):
         return True
 
 
+def shift(board, direction):
+    """
+    Inputs: 
+        A board, and the direction to shift it in
+    Outputs: 
+        The board after the shift 
+        in the specified direction. 
+    """
 
+    move = moveList[0]
+    
+    if move == Move.DOWN:
+        rotateCCW(board)
+    elif move == Move.UP:
+        rotateCW(board)
+    elif move == Move.LEFT:
+        rotateCCW(board)
+        rotateCCW(board)
+    elif move == Move.RIGHT:
+        pass
+    else:
+        raise("Board has been asked to simulate an invalid move.")
 
-def shift(self, direction):
-    pass
+    shiftRight(board)
+    
+    if move == Move.DOWN:
+        rotateCW(board)
+    elif move == Move.UP:
+        rotateCCW(board)
+    elif move == Move.LEFT:
+        rotateCW(board)
+        rotateCW(BOARD)
+    elif move == Move.RIGHT:
+        pass
+    else:
+        raise("Board has been asked to simulate an invalid move.")
+
+    return
+
 # This code is NOT DRY AT ALL. Gotta figure out 
 # a way to make it DRY. 
-def shiftDown(board):
-    newBoard =  [[0,0,0,0],
-                 [0,0,0,0],
-                 [0,0,0,0],
-                 [0,0,0,0]]
-    for columnIndex in range(0,4):
-        nonZeroValues = []
-        for rowIndex in range(0,4):
-            if (board[rowIndex][columnIndex] != 0):
-                nonZeroValues.append(board[rowIndex][columnIndex])
-        newCol = [0]*(4-len(nonZeroValues))
-        for item in nonZeroValues:
-            newCol.append(item)
-        for rowIndex in range(0,4):
-            newBoard[rowIndex][columnIndex] = newCol[rowIndex]
-    return newBoard
-
-
-def shiftUp(board):
-    newBoard =  [[0,0,0,0],
-                 [0,0,0,0],
-                 [0,0,0,0],
-                 [0,0,0,0]]
-
-    for columnIndex in range(0,4):
-        nonZeroValues = []
-        for rowIndex in range(0,4):
-            if (board[rowIndex][columnIndex] != 0):
-                nonZeroValues.append(board[rowIndex][columnIndex])
-        newCol = []
-        for item in nonZeroValues:
-            newCol.append(item)
-        for index in range(0, 4-len(nonZeroValues)):
-            newCol.append(0)
-            
-        for rowIndex in range(0,4):
-            newBoard[rowIndex][columnIndex] = newCol[rowIndex]
-    
-    return newBoard
-
-
-def shiftLeft(board):
-    newBoard =  [[0,0,0,0],
-                 [0,0,0,0],
-                 [0,0,0,0],
-                 [0,0,0,0]]
-
-    for rowIndex in range(0,4):
-        nonZeroValues = []
-        for colIndex in range(0,4):
-            if (board[rowIndex][colIndex] != 0):
-                nonZeroValues.append(board[rowIndex][colIndex])
-        newRow = []
-        for item in nonZeroValues:
-            newRow.append(item)
-        for index in range(0, 4-len(nonZeroValues)):
-            newRow.append(0)
-            
-        for colIndex in range(0,4):
-            newBoard[rowIndex][colIndex] = newRow[colIndex]
-    
-    return newBoard
-
-
 def shiftRight(board):
     newBoard =  [[0,0,0,0],
                  [0,0,0,0],
@@ -371,6 +285,15 @@ def shiftRight(board):
             newBoard[rowIndex][colIndex] = newRow[colIndex]
     
     return newBoard
+
+def rotateCW(board):
+    pass
+
+def rotateCCW(board):
+    rotateCW(board)
+    rotateCW(board)
+    rotateCW(board)
+    
 
 
 def addTiles(self):

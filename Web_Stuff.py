@@ -2,6 +2,26 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 
+SITE_URL = "https://play2048.co"
+
+
+def goToWebsite():
+    
+    options = webdriver.ChromeOptions()
+    options.add_argument('--ignore-certificate-errors')
+    options.add_argument('--ignore-ssl-errors')
+    
+    driver = webdriver.Chrome(ChromeDriverManager().install())
+    driver.get(SITE_URL)
+
+    return driver
+
+def getGameStatus(driver):
+    return driver.find_element_by_css_selector(".game-container p")
+
+def getController(driver):
+    return driver.find_element_by_css_selector('html')
+
 
 def getTiles(driver):
     tileContainer = driver.find_element_by_class_name("tile-container")

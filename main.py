@@ -1,44 +1,42 @@
-import Moves
+from Moves import Move
+import board
+
+from Web_Stuff import getTiles, goToWebsite
+import Web_Stuff as web
+
 
 myBoard = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
 
+MOVE_TO_KEY = {
+    Move.UP: web.Keys.UP,
+    Move.DOWN: web.Keys.DOWN,
+    Move.RIGHT: web.Keys.RIGHT,
+    Move.LEFT: web.Keys.LEFT
+    }
 
-
-def main(ply, weights):
-
-    # The dream pseudocode:
-    # 
-    # navigate to website
+def main(ply, weights):    
+    """
+    # Pseudocode:
+    # go to website
     # while game isn't over:
-    #   get the current board
+    #   get current board from website
     #   figure out the best move
     #   send the best move to the website. 
-
-    options = webdriver.ChromeOptions()
-    options.add_argument('--ignore-certificate-errors')
-    options.add_argument('--ignore-ssl-errors')
-    
-    
-    driver = webdriver.Chrome(ChromeDriverManager().install())
-    driver.get("https://play2048.co")
+    """
     
 
-    gameStatus = driver.find_element_by_css_selector(".game-container p")
-
-    controller = driver.find_element_by_css_selector('html')
-
+    driver = web.goToWebsite()
+    controller = web.getController(driver)
+    gameStatus = web.getStatus(driver)
+    
     while (gameStatus.text != "Game over!"):
+        
         currentBoard = getTiles(driver)
+        bestMove = board.calculateBestMove(currentBoard, ply, weights)
         
-        bestSequence = calculateBestSequenceSnake(currentBoard,ply, weights)
+        try:
+            controller.send_keys(MOVE_TO_KEY[bestMove])
+        except:
+            raise("Invalid Move Sent to Controller")
         
-        if (bestSequence[0] == "Left"):
-            controller.send_keys(Keys.LEFT)
-        elif (bestSequence[0] == "Right"):
-            controller.send_keys(Keys.RIGHT)
-        elif (bestSequence[0] == "Up"):
-            controller.send_keys(Keys.UP)
-        else:
-            controller.send_keys(Keys.DOWN)
-
-
+        gameStatus = web.getStatus(driver)
